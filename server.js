@@ -7,7 +7,8 @@ const csrfProtection = require('csurf')({ cookie: true });
 const bodyParser = require('body-parser');
 const logger = require('./utils/logger');
 const path = require('path');
-const { config, port } = require('./routes/instances');
+const { config, port } = require('./config');
+
 
 if (config.sentry_key) Sentry.init({ dsn: config.sentry_key });
 

@@ -1,5 +1,9 @@
 // NODE PACKAGES
-const Redis = require('ioredis');
+if (process.env.DISABLE_SCRAPERS === 'true') {
+  module.exports = {};
+  return;
+}
+
 
 // LOCAL FUNCTIONS
 const logger = require('../utils/logger');
@@ -18,10 +22,20 @@ const getCDCDInfluenzaData = require('../scrapers/influenza/getCDC');
 // KEYS
 const { config, keys, port } = require('../config');
 
-const redis = new Redis(config.redis.host, {
-	password: config.redis.password,
-	port: config.redis.port
-});
+let redis = null;
+
+if (!config.disableRedis) {
+  const Redis = require('ioredis'); // <-- moved INSIDE
+  redis = new Redis({
+    host: config.redis.host,
+    port: config.redis.port,
+    password: config.redis.password,
+    maxRetriesPerRequest: 1,
+    enableReadyCheck: false,
+    retryStrategy: () => null
+  });
+}
+
 
 module.exports = {
 	redis,

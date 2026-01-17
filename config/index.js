@@ -2,6 +2,8 @@ const keys = require('./config.keys.json');
 const logger = require('../utils/logger');
 const dotenv = require('dotenv').config();
 const config = { redis: {} };
+config.disableRedis = process.env.DISABLE_REDIS === "true";
+config.redis = {};
 
 if (dotenv.error) {
 	if (!process.env.DOCKER) {
@@ -16,9 +18,12 @@ if (dotenv.error) {
 const port = process.env.SERVER_PORT || 3000;
 
 // REDIS CONFIGURATION
-config.redis.host = process.env.REDIS_HOST || (process.env.DOCKER ? 'redis' : 'localhost');
-config.redis.port = process.env.REDIS_PORT || 6379;
-config.redis.password = process.env.REDIS_PASSWORD || '';
+if (!config.disableRedis) {
+  config.redis.host = process.env.REDIS_HOST || "localhost";
+  config.redis.port = process.env.REDIS_PORT || 6379;
+  config.redis.password = process.env.REDIS_PASSWORD || null;
+}
+
 
 // SCRAPER INTERVALS
 config.worldometersInterval = process.env.INTERVAL || 6e5;
